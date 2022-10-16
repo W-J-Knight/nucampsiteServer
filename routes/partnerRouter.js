@@ -4,6 +4,7 @@ const partnerRouter = express.Router();
 const authenticate = require('../authenticate');
 
 partnerRouter.route("/")
+// for anyone admin, member, vistors
     .get((req, res, next) => {
         Partner.find()
         .then(partner => {
@@ -13,7 +14,8 @@ partnerRouter.route("/")
         })
         .catch(err => next(err));
     })
-    .post(authenticate.verifyUser,(req, res, next) => {
+    //  admin-only access point
+    .post(authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
         Partner.create(req.body)
         .then(partner => {
             console.log('Partner Created ', partner);
@@ -23,11 +25,13 @@ partnerRouter.route("/")
         })
         .catch(err => next(err));
     })
+    // not supported
     .put(authenticate.verifyUser,(req, res) => {
         res.statusCode = 403;
         res.end("PUT operation not supported on /partners");
     })
-    .delete(authenticate.verifyUser,(req, res, next) => {
+    // admin-only access point
+    .delete(authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
         Partner.deleteMany()
         .then(response => {
             res.statusCode = 200;
@@ -37,9 +41,9 @@ partnerRouter.route("/")
         .catch(err => next(err));
     });
 
-    // http://localhost:3000/partners/63416a5acc65a0a3ffcf0d49
 partnerRouter
     .route("/:partnerId")
+    // for anyone admin, members, vistors
     .get((req, res, next) => {
         Partner.findById(req.params.partnerId)
         .then(partner => {
@@ -49,13 +53,15 @@ partnerRouter
         })
         .catch(err => next(err));
     })
+    // not supported 
     .post(authenticate.verifyUser,(req, res) => {
         res.statusCode = 403;
         res.end(
             `POST operation not supported on /partners/${req.params.partnerId}`
         );
     })
-    .put(authenticate.verifyUser,(req, res, next) => {
+    // admin-only access point
+    .put(authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
         Partner.findByIdAndUpdate(req.params.partnerId, {
             $set: req.body
         }, { new: true })
@@ -66,7 +72,8 @@ partnerRouter
         })
         .catch(err => next(err));
     })
-    .delete(authenticate.verifyUser,(req, res, next) => {
+    // admin-only access point
+    .delete(authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
         Partner.findByIdAndDelete(req.params.partnerId)
         .then(response => {
             res.statusCode = 200;
