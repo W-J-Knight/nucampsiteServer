@@ -2,10 +2,12 @@ const express = require("express");
 const Partner = require('../models/partner');
 const partnerRouter = express.Router();
 const authenticate = require('../authenticate');
+const cors = require('./cors');
 
 partnerRouter.route("/")
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
 // for anyone admin, member, vistors
-    .get((req, res, next) => {
+    .get(cors.cors, (req, res, next) => {
         Partner.find()
         .then(partner => {
             res.statusCode = 200;
@@ -15,7 +17,7 @@ partnerRouter.route("/")
         .catch(err => next(err));
     })
     //  admin-only access point
-    .post(authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+    .post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
         Partner.create(req.body)
         .then(partner => {
             console.log('Partner Created ', partner);
@@ -26,12 +28,12 @@ partnerRouter.route("/")
         .catch(err => next(err));
     })
     // not supported
-    .put(authenticate.verifyUser,(req, res) => {
+    .put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res) => {
         res.statusCode = 403;
         res.end("PUT operation not supported on /partners");
     })
     // admin-only access point
-    .delete(authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+    .delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
         Partner.deleteMany()
         .then(response => {
             res.statusCode = 200;
@@ -43,8 +45,9 @@ partnerRouter.route("/")
 
 partnerRouter
     .route("/:partnerId")
+    .options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
     // for anyone admin, members, vistors
-    .get((req, res, next) => {
+    .get(cors.cors, (req, res, next) => {
         Partner.findById(req.params.partnerId)
         .then(partner => {
             res.statusCode = 200;
@@ -54,14 +57,14 @@ partnerRouter
         .catch(err => next(err));
     })
     // not supported 
-    .post(authenticate.verifyUser,(req, res) => {
+    .post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res) => {
         res.statusCode = 403;
         res.end(
             `POST operation not supported on /partners/${req.params.partnerId}`
         );
     })
     // admin-only access point
-    .put(authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+    .put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
         Partner.findByIdAndUpdate(req.params.partnerId, {
             $set: req.body
         }, { new: true })
@@ -73,7 +76,7 @@ partnerRouter
         .catch(err => next(err));
     })
     // admin-only access point
-    .delete(authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+    .delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
         Partner.findByIdAndDelete(req.params.partnerId)
         .then(response => {
             res.statusCode = 200;
