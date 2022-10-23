@@ -17,7 +17,7 @@ partnerRouter.route("/")
         .catch(err => next(err));
     })
     //  admin-only access point
-    .post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+    .post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
         Partner.create(req.body)
         .then(partner => {
             console.log('Partner Created ', partner);
@@ -33,7 +33,7 @@ partnerRouter.route("/")
         res.end("PUT operation not supported on /partners");
     })
     // admin-only access point
-    .delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+    .delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
         Partner.deleteMany()
         .then(response => {
             res.statusCode = 200;
@@ -64,7 +64,7 @@ partnerRouter
         );
     })
     // admin-only access point
-    .put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+    .put(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
         Partner.findByIdAndUpdate(req.params.partnerId, {
             $set: req.body
         }, { new: true })
@@ -76,7 +76,7 @@ partnerRouter
         .catch(err => next(err));
     })
     // admin-only access point
-    .delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+    .delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
         Partner.findByIdAndDelete(req.params.partnerId)
         .then(response => {
             res.statusCode = 200;

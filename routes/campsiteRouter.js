@@ -18,7 +18,7 @@ campsiteRouter.route('/')
     .catch(err => next(err));
 })
 // admin-only access point
-.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+.post(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
     Campsite.create(req.body)
     .then(campsite => {
         console.log('Campsite Created ', campsite);
@@ -34,7 +34,7 @@ campsiteRouter.route('/')
     res.end('PUT operation not supported on /campsites');
 })
 // admin-only access point
-.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyUser,(req, res, next) => {
+.delete(cors.corsWithOptions,authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
     Campsite.deleteMany()
     .then(response => {
         res.statusCode = 200;
